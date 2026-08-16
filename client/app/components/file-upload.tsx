@@ -5,7 +5,17 @@ import { Upload, CheckCircle, Loader2, FileText, MessageSquareText, Zap, AlertCi
 const MAX_FILE_SIZE_MB = 5;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
-const FileUploadComponent: React.FC = () => {
+interface CurrentDoc {
+  documentId: string;
+  filename: string;
+}
+
+interface Props {
+  /** Called once the upload API responds with a documentId + filename. */
+  onDocumentReady: (doc: CurrentDoc) => void;
+}
+
+const FileUploadComponent: React.FC<Props> = ({ onDocumentReady }) => {
   const [status, setStatus] = React.useState<'idle' | 'uploading' | 'done'>('idle');
   const [fileName, setFileName] = React.useState<string>('');
   const [error, setError] = React.useState<string>('');
@@ -39,7 +49,16 @@ const FileUploadComponent: React.FC = () => {
               body: formData,
             });
             if (!res.ok) throw new Error('Upload failed');
-            console.log('File uploaded');
+
+            const data = await res.json();
+            console.log('[Upload] Response:', data);
+
+            // Notify parent with the documentId so chat can scope retrieval
+            onDocumentReady({
+              documentId: data.documentId,
+              filename: data.filename ?? file.name,
+            });
+
             setStatus('done');
           } catch {
             setError('Server error while uploading. Please try again.');
@@ -75,7 +94,7 @@ const FileUploadComponent: React.FC = () => {
             </div>
             <div>
               <h4 className="font-semibold text-slate-200">2. AI Processing</h4>
-              <p className="text-xs text-slate-400">Gemini splits & embeds your document for context.</p>
+              <p className="text-xs text-slate-400">Gemini splits &amp; embeds your document for context.</p>
             </div>
           </div>
           
@@ -116,7 +135,7 @@ const FileUploadComponent: React.FC = () => {
         {status === 'uploading' && (
           <div className="flex flex-col items-center gap-3">
             <Loader2 size={32} className="animate-spin text-blue-500" />
-            <p className="text-sm font-medium text-slate-300">Uploading & processing...</p>
+            <p className="text-sm font-medium text-slate-300">Uploading &amp; processing...</p>
           </div>
         )}
         
@@ -127,7 +146,11 @@ const FileUploadComponent: React.FC = () => {
             <p className="text-xs text-slate-400 max-w-[200px] truncate">{fileName}</p>
             <button 
               className="mt-3 text-xs text-slate-300 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-full transition-colors"
-              onClick={(e) => { e.stopPropagation(); setStatus('idle'); setFileName(''); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setStatus('idle');
+                setFileName('');
+              }}
             >
               Upload a different file
             </button>

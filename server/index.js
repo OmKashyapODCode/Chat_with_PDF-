@@ -7,11 +7,17 @@ import { connectQueue } from './config/queue.js';
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// ── Middlewares ──────────────────────────────────────────────────────────────
+// Support multiple comma-separated origins, e.g. "https://prod.vercel.app,http://localhost:3000"
+const rawOrigins = process.env.CORS_ORIGIN;
+const corsOrigin = rawOrigins
+  ? rawOrigins.split(',').map((o) => o.trim())
+  : '*';
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || '*', // Set CORS_ORIGIN to your Vercel URL in production
-    methods: ['GET', 'POST'],
+    origin: corsOrigin,
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    credentials: true,
   })
 );
 app.use(express.json());
