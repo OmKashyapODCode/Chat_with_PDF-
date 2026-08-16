@@ -5,7 +5,6 @@ import { CharacterTextSplitter } from '@langchain/textsplitters';
 import { embeddingsModel } from './config/gemini.js';
 import qdrantClient from './config/qdrant.js';
 import { QUEUE_NAME } from './config/queue.js';
-import { Readable } from 'stream';
 
 const COLLECTION_NAME = 'langchainjs-testing';
 const BATCH_SIZE = 50; // Gemini embedding API limit
