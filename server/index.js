@@ -27,6 +27,11 @@ async function startServer() {
   await connectQueue();
   console.log('[Queue] Connected to CloudAMQP');
 
+  // Start Background Worker in the same process (Free Tier workaround)
+  import('./worker.js').catch((err) => {
+    console.error('[Worker] Failed to start worker:', err.message);
+  });
+
   app.listen(PORT, () => {
     console.log(`[Server] Running on PORT: ${PORT}`);
   });
