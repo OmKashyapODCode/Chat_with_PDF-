@@ -1,0 +1,24 @@
+# render.yaml — Render.com Blueprint
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  # ── Express Backend API ──────────────────────────────────────────────────
+  - type: web
+    name: pdf-chat-backend
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
